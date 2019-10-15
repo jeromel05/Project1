@@ -8,6 +8,7 @@
 # il manque logistic regression using gradient descent (or SGD)  et reg logistic regression
 
 import numpy as np
+from UtilityFunctions import *
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm with mse."""
@@ -21,10 +22,11 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss(y, tx, w, method="mse")
         w = w - gamma*grad
         # ***************************************************
-        if not(n_iter%30):
-            print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-
+        #if not(n_iter%30):
+    #print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+    #bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+    print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+        bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
     return w, loss
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size=1):
@@ -39,10 +41,12 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size=1):
         grad = grad / batch_size    
         w = w - grad * gamma
         loss = compute_loss(y, tx, w)
-        if not(n_iter%10):
-            print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-                  bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        #if not(n_iter%10):
+            #print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+                  #bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
     # ***************************************************
+    print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+         bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
     return w, loss
 
 def least_squares(y, tx):
@@ -52,6 +56,8 @@ def least_squares(y, tx):
 
     w=np.linalg.solve(np.dot(tx.T,tx),np.dot(tx.T,y))
     lmse= compute_loss(y, tx, w)
+    print("Loss={l}, w0={w0}, w1={w1}".format(
+          l=lmse, w0=w[0], w1=w[1]))
     return w, lmse
     # ***************************************************
     
@@ -63,9 +69,8 @@ def ridge_regression(y, tx, lambda_):
     # ***************************************************
     return w,lmse
 
-## A RENOMMER ET INTERVERTIR L ET W AVEC LE CODE ECRIT EN MEME TEMPS :logistic_regression(y, tx, initial w, max iters, gamma)
-## N'UTILISE PAS GAMMA...
-def find_optimal_w(y, tX, w_initial, max_iters):
+
+def logistic_regression(y, tX, w_initial, max_iters,gamma):
     """Finds the most likely weights using the iterative Newton-Raphson method."""
     
     # Define parameters to store w and loss
@@ -84,13 +89,13 @@ def find_optimal_w(y, tX, w_initial, max_iters):
                 return log_likelihoods, ws
         
         try:
-            w = w - np.linalg.solve(jacobean,gradient)
+            w = w - gamma*np.linalg.solve(jacobean,gradient)
         except np.linalg.LinAlgError as e:
             print(e)
             #print(log_likelihood,gradient,jacobean)
             print(tX, n_iter)
             
-            return log_likelihoods, ws
+            return ws,log_likelihoods
             
         
         # store w and loss

@@ -2,6 +2,8 @@
 # coding: utf-8
 """some utility functions for project 1."""
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 #LOSS
 def compute_loss(y, tx, w, method="mse"):
@@ -16,6 +18,10 @@ def compute_loss(y, tx, w, method="mse"):
         return np.inner(error,error) / np.shape(y)[0] / 2 #for MSE
     else:
         raise Exception("spam")
+        
+def rmse (lmse) :
+    """ Calculate rmse from lmse"""
+    return np.sqrt(2*lmse)
 
 # SPLIT DATA TRAIN + TEST
 # a utiliser pour les patterns ou on a des mauvaises approximations à chaque fois
@@ -203,5 +209,35 @@ def rescale_y(y): #rescale y to get estimates between -1 and 1
 
 def rescale_predictions(p): #reverse rescaling
     return 2*p-1
+
+
+#PLOT
+
+def plot_implementation(errors, lambdas):
+    """
+    errors and lambas should be list (of the same size) the error for a given lambda,
+    * lambda[0] = 1
+    * errors[0] = RMSE of a ridge regression of set
+    """
+    plt.semilogx(lambdas,errors, color='b', marker='*', label="Error RMSE")
+    plt.xlabel("lambda")
+    plt.ylabel("RMSE")
+    leg = plt.legend(loc=1, shadow=True)
+    leg.draw_frame(False)
+
+
+def plot_train_test(train_errors, test_errors, lambdas):
+    """
+    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
+    * lambda[0] = 1
+    * train_errors[0] = RMSE of a ridge regression on the train set
+    * test_errors[0] = RMSE of the parameter found by ridge regression applied on the test set
+    """
+    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
+    plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
+    plt.xlabel("lambda")
+    plt.ylabel("RMSE")
+    leg = plt.legend(loc=1, shadow=True)
+    leg.draw_frame(False)
 
 

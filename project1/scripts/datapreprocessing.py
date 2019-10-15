@@ -1,4 +1,5 @@
 #DATA PREPROCESSING
+import numpy as np
 
 def standardize(x):
     """Standardize the original data set."""
@@ -23,6 +24,14 @@ def adding_offset(tX):
 
     tX_w0 = np.c_[np.ones(tX.shape[0]), tX]
     return tX_w0
+
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+
+    px= np.zeros((np.shape(x)[0], degree+1))
+    for i in range (degree+1):
+        px[:,i]=np.power(x,i)
+    return px
 
 def add_interaction_terms(tX):
     # adding interaction terms
