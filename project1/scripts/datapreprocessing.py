@@ -27,11 +27,13 @@ def adding_offset(tX):
 
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
-
-    px= np.zeros((np.shape(x)[0], degree+1))
-    for i in range (degree+1):
-        px[:,i]=np.power(x,i)
-    return px
+    # ***************************************************
+    n = x.shape[0]
+    tx_poly = np.zeros((n,degree))
+    for i in range(n):
+        for j in range(degree):
+            tx_poly[i,j] = x[i]**j
+    return tx_poly
 
 def add_interaction_terms(tX):
     # adding interaction terms

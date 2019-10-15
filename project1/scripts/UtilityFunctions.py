@@ -219,7 +219,7 @@ def plot_implementation(errors, lambdas):
     * lambda[0] = 1
     * errors[0] = RMSE of a ridge regression of set
     """
-    plt.semilogx(lambdas,errors, color='b', marker='*', label="Error RMSE")
+    plt.semilogx(lambdas,errors, color='b', marker='*', label="Train Error RMSE")
     plt.xlabel("lambda")
     plt.ylabel("RMSE")
     leg = plt.legend(loc=1, shadow=True)
