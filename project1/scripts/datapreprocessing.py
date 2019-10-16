@@ -25,6 +25,7 @@ def adding_offset(tX):
     tX_w0 = np.c_[np.ones(tX.shape[0]), tX]
     return tX_w0
 
+#ne marche que pour le cas 1D
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     # ***************************************************
@@ -70,3 +71,12 @@ def add_higher_degree_terms(tX, degree):
     for i in range(2,degree+1):
         tX_c = np.hstack((tX_c,np.power(tX,i)))
     return tX_c
+
+
+def rescale_y(y): #rescale y to get estimates between -1 and 1
+    y_rescaled = np.ones(len(y))
+    y_rescaled[np.where(y==-1)] = 0
+    return y_rescaled
+
+def rescale_predictions(p): #reverse rescaling
+    return 2*p-1

@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def set_missing_explanatory_vars_to_mean(tX):
     # replace -999 by average value

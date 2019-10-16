@@ -86,7 +86,7 @@ def logistic_regression(y, tX, w_initial, max_iters,gamma):
             except FloatingPointError as e:
                 print(e)
                 print(tX, n_iter)
-                return log_likelihoods, ws
+                return ws,log_likelihoods
         
         try:
             w = w - gamma*np.linalg.solve(jacobean,gradient)
@@ -104,4 +104,9 @@ def logistic_regression(y, tX, w_initial, max_iters,gamma):
         log_likelihoods.append(log_likelihood)
 
 
-    return log_likelihoods, ws
+    return  ws,log_likelihoods
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma)
+    raise NotImplementedError
+    return ws, log_lokelihoods

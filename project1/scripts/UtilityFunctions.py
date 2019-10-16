@@ -202,14 +202,6 @@ def compute_jacobean_log_likelihood(w,tX, y): # Be careful! y must be binary. (0
 
     #return -np.dot(tx.T,np.dot(np.diag(p*(1-p)),tx)) # A way more elegant solution. Unfortunately, the diagonal matrix is too large.
 
-def rescale_y(y): #rescale y to get estimates between -1 and 1
-    y_rescaled = np.ones(len(y))
-    y_rescaled[np.where(y==-1)] = 0
-    return y_rescaled
-
-def rescale_predictions(p): #reverse rescaling
-    return 2*p-1
-
 
 #PLOT
 
