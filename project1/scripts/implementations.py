@@ -107,6 +107,6 @@ def logistic_regression(y, tX, w_initial, max_iters,gamma):
     return  ws,log_likelihoods
 
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma)
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     raise NotImplementedError
     return ws, log_lokelihoods
