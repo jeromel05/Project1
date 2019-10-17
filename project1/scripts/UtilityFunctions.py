@@ -166,42 +166,24 @@ def pca(tX): # Computes principal components of the set of observations.
 
 # FOR LOGISTIC REGRESSION
 
-def compute_p(w,tX): 
-    """
-        Computes probabilities of all observations in tX corresponding to -1 = 'b' or 1 = 's' based on weights w according to the logistc transformation.
-        (p = 0 correponds to -1 resp. 'b' and p = 1 to 1 resp. 's' to simplify the computations)
-    """
-    #odds = np.exp(np.dot(tX,w))
-    odds = np.nan_to_num(np.exp(np.dot(tX,w)))
-    
-    return odds/(1+odds)
+def sigmoid(t):
+    """apply sigmoid function on t."""
+    return np.exp(t)/(1+np.exp(t))
 
-def compute_log_likelihood(w,tX, y): # Be careful! y must be binary. (0 or 1) !!
-    "Computes the log-likelihood of observing the data tX with the given weights w."
-    
-    p = compute_p(w,tX)
-    return sum(y*np.nan_to_num(np.log(p))+(1-y)*np.nan_to_num(np.log(1-p)))
+#nb : different from compute_loss used for linear regression
+def calculate_loss(y, tx, w):
+    """compute the cost by negative log likelihood."""
+    return np.sum(np.log(1+np.exp(np.dot(tx,w)))-y*(np.dot(tx,w)))
 
-def compute_gradient_log_likelihood(w,tX, y): # Be careful! y must be binary. (0 or 1) !!
-    "Computes the gradient of the log-likelihood the given current weights w and the data tX with respect to w."
-    
-    p = compute_p(w,tX) 
-    odds = np.exp(np.dot(tX,w)) 
-    return np.dot(tX.T,(y-p))
+def calculate_gradient(y, tx, w):
+    """compute the gradient of loss."""
+    return np.dot(tx.T,sigmoid(np.dot(tx,w))-y)
 
-def compute_jacobean_log_likelihood(w,tX, y): # Be careful! y must be binary. (0 or 1) !!
-    "Computes the jacobean of the log-likelihood the given current weights w and the data tX with respect to w."
-    
-    jacobean = np.zeros((len(w), len(w)))
-    p = compute_p(w,tX) 
-    for i in range(len(w)):
-        for j in range(len(w)):
-            jacobean[i,j] = sum(tX[:,i]*tX[:,j]*(p*(1-p)))
-    
-    return -jacobean
-
-    #return -np.dot(tx.T,np.dot(np.diag(p*(1-p)),tx)) # A way more elegant solution. Unfortunately, the diagonal matrix is too large.
-
+def calculate_hessian(y, tx, w):
+    """return the hessian of the loss function."""
+    a=sigmoid(np.dot(tx,w))*(1-sigmoid(np.dot(tx,w)))
+    s=a*np.eye(y.shape[0])
+    return np.dot(tx.T,np.dot(s,tx))
 
 #PLOT
 

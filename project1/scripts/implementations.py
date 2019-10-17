@@ -70,43 +70,33 @@ def ridge_regression(y, tx, lambda_):
     return w,lmse
 
 
-def logistic_regression(y, tX, w_initial, max_iters,gamma):
-    """Finds the most likely weights using the iterative Newton-Raphson method."""
+def logistic_regression(y, tX, initial_w, max_iters,gamma):
+    """logistic regression using gradient descent"""
+    w=initial_w
+    for iter in range(max_iters):
+        loss= calculate_loss(y,tX,w)
+        gradient=calculate_gradient(y,tX,w)
+        w=w-gamma*gradient  
+    print("loss={l}".format(l=calculate_loss(y, tX, w)))
+    return w,loss
+
+def logistic_regression_newton(y,tX,initial_w,max_iters,gamma) :
+    """logistic regression using newton """
+    w=initial_w
+    for iter in range(max_iters):
+        loss=calculate_loss(y, tX, w)
+        gradient=calculate_gradient(y, tX, w)
+        h=calculate_hessian(y, tX, w)
+        w=w-gamma*np.dot(np.linalg.inv(h),gradient)
+    print("loss={l}".format(l=calculate_loss(y, tX, w)))
+    return w,loss
     
-    # Define parameters to store w and loss
-    ws = [w_initial]
-    log_likelihoods = [compute_log_likelihood(w_initial,tX, y)]
-    w = w_initial
-    for n_iter in range(max_iters):
-        
-        with np.errstate(divide='raise',invalid='raise'):
-            try:
-                gradient = compute_gradient_log_likelihood(w, tX, y)
-                jacobean = compute_jacobean_log_likelihood(w,tX, y)
-            except FloatingPointError as e:
-                print(e)
-                print(tX, n_iter)
-                return ws,log_likelihoods
-        
-        try:
-            w = w - gamma*np.linalg.solve(jacobean,gradient)
-        except np.linalg.LinAlgError as e:
-            print(e)
-            #print(log_likelihood,gradient,jacobean)
-            print(tX, n_iter)
-            
-            return ws,log_likelihoods
-            
-        
-        # store w and loss
-        ws.append(w)
-        log_likelihood = compute_log_likelihood(w,tX, y)
-        log_likelihoods.append(log_likelihood)
-
-
-    return  ws,log_likelihoods
-
-
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
-    raise NotImplementedError
-    return ws, log_lokelihoods
+def reg_logistic_regression(y, tX, lambda_, initial_w, max_iters, gamma):
+    w=initial_w
+    for iter in range(max_iters):
+        loss=calculate_loss(y,tX,w)+lambda_/2*np.dot(w.T,w)
+        gradient=calculate_gradient(y,tX,w)
+        hessian=calculate_hessian(y,tX,w)
+        w=w-gamma*np.dot(np.linalg.inv(hessian),gradient)
+    print("loss={l}".format(l=calculate_loss(y, tX, w)))
+    return w, loss
