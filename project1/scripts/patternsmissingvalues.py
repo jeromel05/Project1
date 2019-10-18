@@ -11,7 +11,6 @@ def set_missing_explanatory_vars_to_mean(tX):
 
 
 # Taking into account their pattern for the handling of missing values
-
 def split_data_according_to_pattern_of_missing_values(tX):
     
     """

@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 
 
 #LOSS
-def compute_loss(y, tx, w, method="mse"):
+def compute_loss_linear(y, tx, w, method="mse"):
     """Calculate the loss.
-
     You can calculate the loss using mse or mae.
     """
     error = y - np.dot(tx,w)
@@ -17,7 +16,7 @@ def compute_loss(y, tx, w, method="mse"):
     elif method == "mse":
         return np.inner(error,error) / np.shape(y)[0] / 2 #for MSE
     else:
-        raise Exception("spam")
+        raise Exception("Specified method unknown")
         
 def rmse (lmse) :
     """ Calculate rmse from lmse"""
@@ -34,7 +33,6 @@ def split_data(x, y, ratio, seed=1):
     """
     # set seed
     np.random.seed(seed)
-    # ***************************************************
     itrain=np.random.choice(y.shape[0],int(ratio*y.shape[0]),replace=False)
     # np.arange(size) donne les numéros de 0 à size
     itest = np.delete(np.arange(y.shape[0]),itrain)
@@ -43,7 +41,6 @@ def split_data(x, y, ratio, seed=1):
     xtest=x[itest]
     ytest=y[itest]
     return xtrain,ytrain,xtest,ytest
-    
     
 #FOR GRADIENT DESCENT   
 def compute_gradient(y, tx, w):
@@ -54,7 +51,6 @@ def compute_gradient(y, tx, w):
 
 def compute_subgradient(y, tx, w):
     """Compute the subgradient for MAE."""
-    # **************************************************
     n = np.shape(tx)[0]
     error = (y - np.dot(tx,w))
     for e in error: #faire le vector set_h element wise!!!!
@@ -64,51 +60,8 @@ def compute_subgradient(y, tx, w):
             e = 1 
         else:
           #print("non-diff point")
-            e = uniform(-1.0,1.0)
-                
+            e = uniform(-1.0,1.0)         
     return - np.dot(error, tx) / n
-
-def subgradient_descent(y, tx, initial_w, max_iters, gamma):
-    """Subgradient descent algorithm using mae cost function."""
-    # Define parameters to store w and loss
-    ws = [initial_w]
-    losses = []
-    w = initial_w
-    for n_iter in range(max_iters):
-        # ***************************************************
-        grad = compute_subgradient(y, tx, w)
-        loss = compute_loss(y, tx, w, method="mae")
-        w = w - gamma*grad
-        # ***************************************************
-        # store w and loss
-        ws.append(w)
-        losses.append(loss)
-        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-
-    return losses[-1], ws[-1]
-
-
-def stochastic_subgradient_descent(
-        y, tx, initial_w, batch_size, max_iters, gamma):
-    """Stochastic gradient descent algorithm."""
-    # ***************************************************
-    ws = [initial_w]
-    grad = 0
-    losses = []
-    w = initial_w
-    for i in range(max_iters):
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size):
-                grad = compute_subgradient(minibatch_y, minibatch_tx,w)
-        grad = grad / batch_size    
-        w = w - grad * gamma
-        ws.append(w)
-        loss=compute_loss(y, tx, w)
-        losses.append(loss)
-        print("GD: loss={l}, w0={w0}, w1={w1}".format(
-             l=loss, w0=w[0], w1=w[1]))
-    # ***************************************************
-    return losses[-1], ws[-1]
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
@@ -138,20 +91,16 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 
 
 # VISUALIZATION
-
 def pca(tX): # Computes principal components of the set of observations.
-    
     """
         This orthogonal transformation leads to the first principal component having the largest possible variance.
         Each succeeding component in turn has the highest variance possible under the constraint that it is orthogonal to the preceding components.
     """
-
     n, m = tX.shape
     # center data matrix tX
     tX_centered = np.nan_to_num((tX - np.mean(tX, 0)) / np.std(tX, 0)) ## Better solution required!!
     
     assert np.allclose(tX_centered.mean(axis=0), np.zeros(m))
-
     # Compute covariance matrix
     C = np.dot(tX_centered.T, tX_centered) / (n-1)
     
@@ -165,28 +114,26 @@ def pca(tX): # Computes principal components of the set of observations.
 
 
 # FOR LOGISTIC REGRESSION
-
 def sigmoid(t):
     """apply sigmoid function on t."""
     return np.exp(t)/(1+np.exp(t))
 
 #nb : different from compute_loss used for linear regression
-def calculate_loss(y, tx, w):
+def calculate_loss_logistic(y, tx, w):
     """compute the cost by negative log likelihood."""
-    return np.sum(np.log(1+np.exp(np.dot(tx,w)))-y*(np.dot(tx,w)))
+    return np.sum(np.log(1+np.exp(np.dot(tx,w)))-y*(np.dot(tx,w)), axis=0)
 
-def calculate_gradient(y, tx, w):
+def calculate_gradient_logistic(y, tx, w):
     """compute the gradient of loss."""
-    return np.dot(tx.T,sigmoid(np.dot(tx,w))-y)
+    return np.dot(tx.T, sigmoid(np.dot(tx,w)) - y)
 
 def calculate_hessian(y, tx, w):
     """return the hessian of the loss function."""
-    a=sigmoid(np.dot(tx,w))*(1-sigmoid(np.dot(tx,w)))
-    s=a*np.eye(y.shape[0])
+    diagonal_values=sigmoid(np.dot(tx,w))*(1-sigmoid(np.dot(tx,w)))
+    s=diagonal_values*np.eye(y.shape[0])
     return np.dot(tx.T,np.dot(s,tx))
 
 #PLOT
-
 def plot_implementation(errors, lambdas):
     """
     errors and lambas should be list (of the same size) the error for a given lambda,
