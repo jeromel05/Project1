@@ -79,7 +79,7 @@ def logistic_regression_newton(y,tX,initial_w,max_iters,gamma) :
           l=loss, w0=w[0], w1=w[1]))
         gradient=calculate_gradient_logistic(y, tX, w)
         h=calculate_hessian(y, tX, w)
-        print(
+        print("22")
         w=w-gamma*np.dot(np.linalg.inv(h),gradient)
         
     return w,loss
