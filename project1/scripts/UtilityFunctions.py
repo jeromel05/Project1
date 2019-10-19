@@ -130,8 +130,8 @@ def calculate_gradient_logistic(y, tx, w):
 def calculate_hessian(y, tx, w):
     """return the hessian of the loss function."""
     diagonal_values=sigmoid(np.dot(tx,w))*(1-sigmoid(np.dot(tx,w)))
-    s=diagonal_values*np.eye(y.shape[0])
-    return np.dot(tx.T,np.dot(s,tx))
+    #Not possible to do such a large diagonal matrix -> we mutliply the matrix by these values directly
+    return np.dot(tx.T*diagonal_values,tx)
 
 #PLOT
 def plot_implementation(errors, lambdas):

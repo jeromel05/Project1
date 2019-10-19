@@ -54,8 +54,7 @@ def ridge_regression(y, tx, lambda_):
     #ridge regression using normal equations
     w=np.linalg.solve((np.dot(tx.T,tx)+lambda_*2*y.shape[0]*np.eye(tx.shape[1])),np.dot(tx.T,y))
     loss= compute_loss_linear(y, tx, w)
-    print("Loss={l}, λ={la}".format(
-          l=loss, la=lambda_))
+    #print("Loss={l}, λ={la}".format(l=loss, la=lambda_))
     return w,loss
 
 
@@ -63,34 +62,57 @@ def logistic_regression(y, tX, initial_w, max_iters,gamma):
     """logistic regression using gradient descent"""
     w=initial_w
     for iter in range(max_iters):
-        loss= calculate_loss_logistic(y,tX,w)
-        gradient=calculate_gradient_logistic(y,tX,w)
-        w=w+gamma*gradient  
-        print("Loss={l}, w0={w0}, w1={w1}".format(
-          l=loss, w0=w[0], w1=w[1]))
+         with np.errstate(all='raise'):
+            try:
+                loss= calculate_loss_logistic(y,tX,w)
+                gradient=calculate_gradient_logistic(y,tX,w)
+                w=w+gamma*gradient  
+                print("Loss={l}, w0={w0}, w1={w1}".format(l=loss, w0=w[0], w1=w[1]))
+            except FloatingPointError as e:
+                    print(e)
+                    break
+            except np.linalg.LinAlgError as e:
+                    print(e)
+                    break
+                
     return w,loss
 
 def logistic_regression_newton(y,tX,initial_w,max_iters,gamma) :
     """logistic regression using newton """
     w=initial_w
     for iter in range(max_iters):
-        loss=calculate_loss_logistic(y, tX, w)
-        print("Loss={l}, w0={w0}, w1={w1}".format(
-          l=loss, w0=w[0], w1=w[1]))
-        gradient=calculate_gradient_logistic(y, tX, w)
-        h=calculate_hessian(y, tX, w)
-        print("22")
-        w=w-gamma*np.dot(np.linalg.inv(h),gradient)
-        
+        with np.errstate(all='raise'):
+            try:
+                loss=calculate_loss_logistic(y, tX, w)
+                gradient=calculate_gradient_logistic(y, tX, w)
+                h=calculate_hessian(y, tX, w)
+         
+                w=w-gamma*np.dot(np.linalg.inv(h),gradient)
+            except FloatingPointError as e:
+                    print(e)
+                    break
+            except np.linalg.LinAlgError as e:
+                    print(e)
+                    break
+    print("Loss={l}, w0={w0}, w1={w1}".format(
+                  l=loss, w0=w[0], w1=w[1]))
     return w,loss
     
 def reg_logistic_regression(y, tX, lambda_, initial_w, max_iters, gamma):
     w=initial_w
     for iter in range(max_iters):
-        loss=calculate_loss_logistic(y,tX,w)+lambda_/2*np.dot(w.T,w)
-        gradient=calculate_gradient_logistic(y,tX,w)
-        hessian=calculate_hessian(y,tX,w)
-        w=w-gamma*np.dot(np.linalg.inv(hessian),gradient)
+        with np.errstate(all='raise'):
+            try:
+                loss=calculate_loss_logistic(y,tX,w)+lambda_/2*np.dot(w.T,w)
+                gradient=calculate_gradient_logistic(y,tX,w)
+                hessian=calculate_hessian(y,tX,w)
+                w=w-gamma*np.dot(np.linalg.inv(hessian),gradient)
+            except FloatingPointError as e:
+                    print(e)
+                    break
+            except np.linalg.LinAlgError as e:
+                    print(e)
+                    break
     print("Loss={l}, w0={w0}, w1={w1}".format(
           l=loss, w0=w[0], w1=w[1]))
     return w, loss
