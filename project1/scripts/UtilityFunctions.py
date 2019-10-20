@@ -116,7 +116,22 @@ def pca(tX): # Computes principal components of the set of observations.
 # FOR LOGISTIC REGRESSION
 def sigmoid(t):
     """apply sigmoid function on t."""
-    return np.exp(t)/(1+np.exp(t))
+    if(len(t) > 1):
+        res = np.zeros(len(t))
+        for ind,el in enumerate(t):
+            if(el < -1e8):
+                #if the ith element of the vector t is either very large or small, we return the value 1 or 0 respectively
+                #it would serve no purpose to calculate this value exactly and it can potentially cause errors
+                res[ind] = 0.0
+            elif(el > 1e8):
+                res[ind] = 1.0
+            else:
+                res[ind] = np.exp(el)/(1+np.exp(el))
+        return res
+    elif(t < -1e8 or t > 1e8):
+        return np.nan_to_num(t, nan=0.0, posinf=1, neginf=0)
+    else:
+        return np.exp(t)/(1+np.exp(t))
 
 #nb : different from compute_loss used for linear regression
 def calculate_loss_logistic(y, tx, w):
