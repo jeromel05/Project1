@@ -45,15 +45,28 @@ def add_square_terms(tX):
     return np.hstack((tX,np.power(tX,2)))
 
 def add_higher_degree_terms(tX, degree):
-    """ The function returns a data matrix complemented with exponential terms of the explanatory 
+    """ The function returns a data matrix complemented with polynomial terms of the explanatory 
         variables up to the degree indicated by the parameter 'degree'.
         
         Ex. [ [1,2,3],    => degree = 3 =>   [ [  1   2   3   1   4   9   1   8  27],
               [4,5,6] ]                        [  4   5   6  16  25  36  64 125 216] ]
     """
-    tX_c = tX
+    tX_c = np.copy(tX)
     for i in range(2,degree+1):
         tX_c = np.hstack((tX_c,np.power(tX,i)))
+    return tX_c
+
+def add_higher_degree_terms_customized(tX, degrees):
+    """ The function returns a data matrix complemented with polynomial terms of the explanatory 
+        variables of degrees indicated by the parameter 'degrees'.
+        
+        Ex. [ [1,2,3],    => degree = (3,4) =>   [ [   1    2    3    1    8   27    1   16   81],
+              [4,5,6] ]                        [   4    5    6   64  125  216  256  625 1296] ]
+              
+    """
+    tX_c = np.copy(tX)
+    for degree in degrees:
+        tX_c = np.hstack((tX_c,np.power(tX,degree)))
     return tX_c
 
 

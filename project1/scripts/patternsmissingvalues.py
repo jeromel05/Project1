@@ -3,7 +3,7 @@ import numpy as np
 def set_missing_explanatory_vars_to_mean(tX):
     # replace -999 by average value
     # Missing values appear as -999 in the data. The function sets them to the mean of the successful measurements of the variable.
-    tX_corr = tX
+    tX_corr = np.copy(tX)
     for i in range(tX.shape[1]):
         mean_xi = np.mean(tX[:,i][np.not_equal(tX[:,i],-999*np.ones(len(tX[:,i])))])
         tX_corr[:,i][np.where(tX_corr[:,i] == -999)] = mean_xi
