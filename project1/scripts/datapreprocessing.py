@@ -1,6 +1,7 @@
 #DATA PREPROCESSING
 import numpy as np
 
+
 def standardize(x):
     """Standardize the original data set."""
     mean_x = np.mean(x)

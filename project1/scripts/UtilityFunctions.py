@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from datapreprocessing import *
 
 #LOSS
 def compute_loss_linear(y, tx, w, method="mse"):
@@ -119,6 +120,8 @@ def cross_validation_logistic_regression_feature_engineering_ridge(tX, y, degree
         
     return rmse_tr, rmse_te, abse_tr, abse_te
 
+
+
 def train_test_split_logistic_regression_feature_engineering_ridge(tX, y, degree, ratio, seed, max_iters, threshold, lambdas, gamma):
     """
     The function splits the data into a test and a training, adds polynomial terms of the explanatory variables up to 
@@ -179,6 +182,39 @@ def train_test_split_logistic_regression_feature_engineering_ridge(tX, y, degree
         print("ratio={r}, degree={d}, seed={s}, lambda={l:.3f}, Training RMSE={tr:.3f}, Testing RMSE={te:.3f}, Training loss={trl:.3f}, Testing loss={tel:.3f}, Training # Missclassification ={m_tr:.3f}, Testing # Missclassification={m_te:.3f}".format(
             r = ratio, d=degree, s=seed, l= lambda_, tr=rmse_tr[ind_lambda], te=rmse_te[ind_lambda], trl = log_likelihoods_train, tel = log_likelihoods_test, m_tr = abse_tr[ind_lambda], m_te = abse_te[ind_lambda]))
     
+    return rmse_tr, rmse_te, abse_tr, abse_te
+
+def train_test_split_logistic_regression_feature_engineering_ridge_demo(tX, y, degrees, split_ratios, seeds, max_iters, threshold, lambdas, gamma):
+    rmse_tr = np.zeros([len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    rmse_te = np.zeros([len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    abse_tr = np.zeros([len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    abse_te = np.zeros([len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    
+    for ind_split_ratio,split_ratio in enumerate(split_ratios):
+        for ind_seed, seed in enumerate(seeds):
+            for ind_degree, degree in enumerate(degrees):
+                rmse_tr[ind_split_ratio,ind_seed,ind_degree,:],rmse_te[ind_split_ratio,ind_seed,ind_degree,:], \
+                abse_tr[ind_split_ratio,ind_seed,ind_degree,:],abse_te[ind_split_ratio,ind_seed,ind_degree,:] = \
+                train_test_split_logistic_regression_feature_engineering_ridge(tX, y,        \
+                                                degree, split_ratio, seed, max_iters, threshold,lambdas,gamma)
+    return     rmse_tr, rmse_te, abse_tr, abse_te
+
+def train_test_split_logistic_regression_feature_engineering_ridge_groups_demo(tX, y, degrees, split_ratios, seeds, max_iters, threshold, lambdas, gamma):
+    
+    tX_split, ind_row_groups, groups_mv_num = split_data_according_to_pattern_of_missing_values(tX)
+    y_split = split_y_according_to_pattern_of_missing_values(y, ind_row_groups)
+    
+    rmse_tr = np.zeros([len(ind_row_groups),len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    rmse_te = np.zeros([len(ind_row_groups),len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    abse_tr = np.zeros([len(ind_row_groups),len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    abse_te = np.zeros([len(ind_row_groups),len(split_ratios),len(seeds),len(degrees),len(lambdas)])
+    
+    for ind_group, ind_row_group in enumerate(ind_row_groups):
+        print('group (' + str(ind_group + 1) + '/' + str(len(groups_mv_num)) + ')')
+        
+        rmse_tr[ind_group], rmse_te[ind_group], abse_tr[ind_group], abse_te[ind_group] = \
+            train_test_split_logistic_regression_feature_engineering_ridge_demo(tX[ind_row_group], rescale_y(y[ind_row_group]), degrees, split_ratios, seeds, max_iters, threshold, lambdas, gamma)
+
     return rmse_tr, rmse_te, abse_tr, abse_te
     
 #FOR GRADIENT DESCENT   
