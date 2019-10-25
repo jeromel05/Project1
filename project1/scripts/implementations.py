@@ -7,7 +7,9 @@
 #NB : we are only interested in the last one 
 
 import numpy as np
-from UtilityFunctions import *
+from loss_computations import *
+from gradient_descent import *
+from functions_for_log_regression import *
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm with mse."""
@@ -80,7 +82,7 @@ def logistic_regression(y, tX, initial_w, max_iters,gamma):
                 loss_new = calculate_loss_logistic(y,tX,w)
                 gradient = calculate_gradient_logistic(y,tX,w)
                 w = w - gamma * gradient  
-                print("Loss={l}, w0={w0}, w1={w1}".format(l=loss_new, w0=w[0], w1=w[1]))
+                #print("Loss={l}, w0={w0}, w1={w1}".format(l=loss_new, w0=w[0], w1=w[1]))
             except FloatingPointError as e:
                     print(e)
                     break
@@ -106,8 +108,8 @@ def logistic_regression_newton(y,tX,initial_w,max_iters,gamma) :
                 gradient=calculate_gradient_logistic(y, tX, w)
                 h=calculate_hessian(y, tX, w)
                 w=w-gamma*np.dot(np.linalg.inv(h),gradient)
-                print("Loss={l}, w0={w0}, w1={w1}".format(
-                  l=loss_new, w0=w[0], w1=w[1]))
+                #print("Loss={l}, w0={w0}, w1={w1}".format(
+                 # l=loss_new, w0=w[0], w1=w[1]))
             except FloatingPointError as e:
                     print(e)
                     break
@@ -140,6 +142,6 @@ def reg_logistic_regression(y, tX, lambda_, initial_w, max_iters, gamma):
                     break
         if(np.abs(loss_new-loss_old) < 1e2 or n_iter >= max_iters):
                     break           
-    print("Loss={l}, λ={la}, w0={w0}, w1={w1}".format(
-          l=loss_new, la=lambda_, w0=w[0], w1=w[1]))
+    #print("Loss={l}, λ={la}, w0={w0}, w1={w1}".format(
+        #  l=loss_new, la=lambda_, w0=w[0], w1=w[1]))
     return w, loss_new
