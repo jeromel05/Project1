@@ -89,7 +89,7 @@ def logistic_regression(y, tX, initial_w, max_iters,gamma):
             except np.linalg.LinAlgError as e:
                     print(e)
                     break
-        if(np.abs(loss_new-loss_old) < 1e2 or n_iter >= max_iters):
+        if(np.abs(loss_new-loss_old) < 1e1 or n_iter >= max_iters):
                     break
                   
     return w,loss_new
@@ -122,6 +122,7 @@ def logistic_regression_newton(y,tX,initial_w,max_iters,gamma) :
     return w,loss_new
     
 def reg_logistic_regression(y, tX, lambda_, initial_w, max_iters, gamma):
+    """logistic regression using newton comprising ridge term"""
     w = initial_w
     loss_new = 0
     n_iter = 0
@@ -131,8 +132,8 @@ def reg_logistic_regression(y, tX, lambda_, initial_w, max_iters, gamma):
                 n_iter += 1
                 loss_old = loss_new
                 loss_new=calculate_loss_logistic(y,tX,w)+lambda_/2*np.dot(w.T,w)
-                gradient=calculate_gradient_logistic(y,tX,w)
-                hessian=calculate_hessian(y,tX,w)
+                gradient=calculate_gradient_logistic(y,tX,w) + lambda_*w
+                hessian=calculate_hessian(y,tX,w) + lambda_*np.eye(len(w))
                 w=w-gamma*np.dot(np.linalg.inv(hessian),gradient)
             except FloatingPointError as e:
                     print(e)

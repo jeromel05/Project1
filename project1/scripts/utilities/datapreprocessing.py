@@ -4,20 +4,12 @@ import numpy as np
 
 def standardize(x):
     """Standardize the original data set."""
+    x_copy = np.copy(x) 
     mean_x = np.mean(x)
-    x = x - mean_x
+    x_copy = x_copy - mean_x
     std_x = np.std(x)
-    x = x / std_x
-    return x, mean_x, std_x
-
-def build_model_data(height, weight):
-    """Form (y,tX) to get regression data in matrix form 
-    with x[:,0] = 1 (offset)."""
-    y = weight
-    x = height
-    num_samples = len(y)
-    tx = np.c_[np.ones(num_samples), x]
-    return y, tx
+    x_copy = x_copy / std_x
+    return x_copy, mean_x, std_x
 
 def adding_offset(tX):
     # adding weight w0
@@ -31,7 +23,7 @@ def add_interaction_terms(tX):
         Ex. [ [1,2,3],    =>   [ [ 1,  2,  3,  1,  2,  3,  4,  6,  9],
               [4,5,6] ]          [ 4,  5,  6, 16, 20, 24, 25, 30, 36] ]
     """
-    tX_c_T = tX.T
+    tX_c_T = np.copy(tX.T)
     for col in range(tX.shape[1]):
         tX_c_T = np.vstack((tX_c_T, tX.T[col:]*tX.T[col]))
     

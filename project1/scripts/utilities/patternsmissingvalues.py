@@ -28,12 +28,10 @@ def split_data_according_to_pattern_of_missing_values(tX):
     
     # Extracting ensemble of columns that contain missing values.
     ind_col = np.arange(tX.shape[1])
-    ind_col_mv = ind_col[np.where(sum(tX == -999) > 0)]
-
+    ind_col_mv = ind_col[sum(tX == -999) > 0]
     tX_cols_mv = tX[:,ind_col_mv]
     
     # Simplifying by taking '0' and '1' to represent present and absent values, respectively. The order of samples is preserved.
-    
     pattern_cols_mv = np.zeros(tX_cols_mv.shape)
     pattern_cols_mv[np.where(tX_cols_mv == -999)] = 1
     
@@ -45,8 +43,7 @@ def split_data_according_to_pattern_of_missing_values(tX):
     
     tX_split = []
     ind_row_groups = []
-    #bool_mask_col_mv_groups = np.array([tX[0,:] == -999])
-    
+ 
     
     for group_mv_num in groups_mv_num:
         # calculating and stocking the indices of the rows of tX that belong to the group
@@ -57,18 +54,14 @@ def split_data_according_to_pattern_of_missing_values(tX):
         
         # extracting subset of tX faling into the group. Removing missing columns and stocking their positions.
         tX_group_rows = tX[ind_row_group,:]
-        bool_mask_col_mv_group = [tX_group_rows[0,:] > -999]
-        #bool_mask_col_mv_groups= np.vstack((bool_mask_col_MV_groups,bool_mask_col_MV_group))
-        
+        bool_mask_col_mv_group = (tX_group_rows[0,:] > -999)
+      
         ind_col = np.arange(tX_group_rows.shape[1])
-        
         tX_split.append(tX_group_rows[:,ind_col[bool_mask_col_mv_group]])
     
-    #bool_mask_col_mv_groups = np.delete(bool_mask_col_MV_groups,[0],axis = 0)
-
-    
+   
     return tX_split, ind_row_groups, groups_mv_num 
-    #bool_mask_col_mv_groups, (np.logical_not(bool_mask_col_mv_groups.flatten())).reshape(bool_mask_col_mv_groups.shape)
+
 
 def split_y_according_to_pattern_of_missing_values(y, ind_row_groups):
     """

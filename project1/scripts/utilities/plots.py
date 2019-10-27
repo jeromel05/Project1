@@ -2,6 +2,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from functions_for_complex_analysis import *
+
 def plot_implementation(errors, lambdas):
     """
     errors and lambas should be list (of the same size) the error for a given lambda,
@@ -29,51 +31,6 @@ def plot_train_test(train_errors, test_errors, lambdas):
     leg = plt.legend(loc=1, shadow=True)
     leg.draw_frame(False)
 
-    
-import warnings
-def calculate_signal_fraction_features_binned(tX,y,nb_bins):
-    """ Bins data of each feature after removing -999. For each bin the ratio of #signal/(#signal+#bg) is computed.
-        The value of of a bin's ratio into which no observation falls is NaN. 
-            Parameters : - the feature matrix, 'tX'
-                         - the corresponding values (s/bg), 'y'
-                         - the  number of bins, 'nb_bins'
-            Returns :    - the matrix containing the ratios for each feature, 'pseudo_likelihoods_binned'
-                         - the matrix defining the bins for each feature, 'shared_bins'
-                         - a list of arrays with the columns of tX cleared of missing values, 'tX_cols_no_missing_val'
-    """    
-    
-    pseudo_likelihoods_binned = np.zeros((tX.shape[1],nb_bins+3))
-    shared_bins = np.zeros((tX.shape[1],nb_bins+1))
-    tX_cols_no_missing_val = []
-
-    for ind_col in range(tX.shape[1]):
-        # Removes absent values (-999s)
-        tX_col_cleared = tX[:,ind_col][tX[:,ind_col]>-999]
-        y_cleared = y[tX[:,ind_col]>-999]
-        tX_cols_no_missing_val.append(tX_col_cleared)
-    
-        # Generating bins to make sure we use the same ones for the colors as we do for the heights of the histogram bars.
-        shared_bins_col = np.histogram_bin_edges(tX_col_cleared, bins = nb_bins)
-        shared_bins[ind_col,:] = shared_bins_col
-    
-    
-        # Counting the number of background (y = -1) and signal (y = 1) in and finally the fraction of signal in each bin
-        ind_tX_col_cleared = np.digitize(tX_col_cleared,shared_bins_col,right = False)
-        nb_bg_bin = np.array([np.count_nonzero(ind_tX_col_cleared[y_cleared < 1/2] == i) for i in range(nb_bins+2)])
-        nb_s_bin = np.array([np.count_nonzero(ind_tX_col_cleared[y_cleared > 1/2] == i) for i in range(nb_bins+2)])
-        #with warnings.catch_warnings():
-            #warnings.simplefilter("ignore")
-        frac_s = nb_s_bin/(nb_bg_bin+nb_s_bin)
-        frac_s[0] = frac_s[1]
-    
-        # Save fraction signal in bin
-        pseudo_likelihoods_binned[ind_col,:] = np.append(frac_s,frac_s[-1])
-    
-    return pseudo_likelihoods_binned,shared_bins,tX_cols_no_missing_val
-
-
-from matplotlib.collections import LineCollection
-from matplotlib import colors
 
 def plot_distribution_features_color_fraction_signal_binned(tX,y,nb_bins):
     """ Plots a histogram of each feature's distribution. The columns are colored as a function of the 
@@ -126,3 +83,69 @@ def plot_distribution_features_color_fraction_signal_binned(tX,y,nb_bins):
     plt.tight_layout()
     plt.savefig("../plots/binned_distribution_of_features_colored_fraction_signal",)
     plt.show()
+    
+
+def find_threshold_pseudo_likelihood_method_groups(tX,y,nb_bins):
+    """ Finds the optimal thresholds for classification according to 'pseudo log likelihoods' for each group with its
+        particular pattern of missing values. It does so by applying the 'pseudo likelihood' method to the training set
+        pased on which the 'pseudo likelihoods' are estimated in the first place. The threshold is chosen to maximize
+        the Matthews correlation coefficient.
+            Parameters: - tX, the training set based on which the 'pseudo likelihoods' are originally estimated
+                        - y, the corresponding y values
+                        - nb_bins, the number of bins into which the features separated
+    """
+    pseudo_likelihoods_binned,shared_bins,tX_cols_no_missing_val = calculate_signal_fraction_features_binned(tX,y,nb_bins)
+    pseudo_likelihoods_groups, y_pseudo_likelihood_pred_groups = calculate_pseudo_likelihood_groups(pseudo_likelihoods_binned,shared_bins,tX)
+    tX_split, ind_row_groups, groups_mv_num = split_data_according_to_pattern_of_missing_values(tX)
+    y_split = split_y_according_to_pattern_of_missing_values(y, ind_row_groups)
+    
+    num_row = 2
+    num_col = int(np.ceil(2*len(y_split)/num_row))
+    fig,ax = plt.subplots(num_row, num_col)
+    #fig.suptitle('Thresholds maximizing matthews correlation coefficient', fontsize=180)
+    fig.set_figheight(75)
+    fig.set_figwidth(150)
+    
+    assert(len(y_split)==len(y_pseudo_likelihood_pred_groups))
+    
+    thresholds_likelihood_groups = np.zeros(len(ind_row_groups))
+    
+    for ind_group, y_pred_group in enumerate(y_pseudo_likelihood_pred_groups):
+
+        
+        ind_sorted = np.argsort(y_pred_group)
+        nb_true_positives = np.zeros(len(ind_sorted))
+        nb_false_positives = np.zeros(len(ind_sorted))
+        nb_true_negatives = np.zeros(len(ind_sorted))
+        nb_false_negatives = np.zeros(len(ind_sorted))
+        
+        for i in range(len(ind_sorted)):
+            nb_true_positives[i] = np.count_nonzero(y_split[ind_group][ind_sorted[i+1:]] == 1)
+            nb_false_positives[i] = len(ind_sorted)-i-nb_true_positives[i]
+            nb_true_negatives[i] = np.count_nonzero(y_split[ind_group][ind_sorted[0:i]] == -1)
+            nb_false_negatives[i] = i-nb_true_negatives[i]
+    
+        mcc = matthews_correlation_coefficient(nb_true_positives,nb_false_positives,nb_true_negatives,nb_false_negatives)
+  
+        thresholds_likelihood_groups[ind_group] = y_pred_group[ind_sorted[np.argmax(mcc)]]
+        
+        
+        ax[0,ind_group].scatter(y_pred_group,y_split[ind_group],s=200)
+        ax[0,ind_group].scatter(thresholds_likelihood_groups[ind_group]*np.ones(50),np.linspace(-1, 1,50),s=200)
+        ax[0,ind_group].tick_params(axis='both', which='major', labelsize=100)
+        ax[0,ind_group].set_title('group '+ str(ind_group+1),fontsize=100)
+        
+        #ax[1,ind_group].scatter(np.arange(len(y_pred_group)),mcc,s=200)
+        ax[1,ind_group].scatter(y_pred_group[ind_sorted],mcc,s=200)
+        ax[1,ind_group].tick_params(axis='both', which='major', labelsize=100)
+        ax[1,ind_group].set_xlabel("pseudo likelihood",fontsize=100)
+        
+    
+    ax[0,0].set_ylabel("s/bg",fontsize=100)
+    ax[1,0].set_ylabel("matthews correlation coefficient",fontsize=100)
+    
+    fig.align_ylabels(ax[:,:])
+    plt.tight_layout()
+    plt.savefig("../plots/proability_boson_explanatory_vars")
+    plt.show()
+    return thresholds_likelihood_groups
