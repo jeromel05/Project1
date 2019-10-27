@@ -40,8 +40,8 @@ def compute_p(w,tX):
         Computes probabilities of all observations in tX corresponding to -1 = 'b' or 1 = 's' based on weights w according to the logistc transformation.
         (p = 0 correponds to -1 resp. 'b' and p = 1 to 1 resp. 's' to simplify the computations)
     """
-    odds = np.exp(np.dot(tX,w))
-    #odds = np.nan_to_num(np.exp(np.dot(tX,w)))
+    #odds = np.exp(np.dot(tX,w))
+    odds = np.nan_to_num(np.exp(np.dot(tX,w)))
     return odds/(1+odds)
 
 def rmse_logistic(err,tX):
