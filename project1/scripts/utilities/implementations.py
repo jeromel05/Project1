@@ -84,13 +84,13 @@ def logistic_regression(y, tX, initial_w, max_iters,gamma):
                 w = w - gamma * gradient  
                 #print("Loss={l}, w0={w0}, w1={w1}".format(l=loss_new, w0=w[0], w1=w[1]))
             except FloatingPointError as e:
-                    print(e)
-                    break
+                print(e)
+                break
             except np.linalg.LinAlgError as e:
-                    print(e)
-                    break
+                print(e)
+                break
         if(np.abs(loss_new-loss_old) < 1e1 or n_iter >= max_iters):
-                    break
+            break
                   
     return w,loss_new
 

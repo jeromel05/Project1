@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datapreprocessing import *
 from functions_for_log_regression import *
+from math import sqrt
 
 # SPLIT DATA TRAIN + TEST
 
@@ -89,8 +90,8 @@ def cross_validation_logistic_regression_feature_engineering_ridge(tX, y, degree
         log_likelihoods_train = calculate_loss_logistic_regression(y_train_split, tX_train_split_extended, w_star)
         log_likelihoods_test = calculate_loss_logistic_regression(y_test_split, tX_test_split_extended, w_star)
     
-        rmse_tr[ind_lambda] = np.linalg.norm((y_train_split - compute_p(w_star,tX_train_split_extended))/y_train_split.shape[0])
-        rmse_te[ind_lambda] = np.linalg.norm((y_test_split - compute_p(w_star,tX_test_split_extended))/y_test_split.shape[0])
+        rmse_tr[ind_lambda] = np.linalg.norm((y_train_split - compute_p(w_star,tX_train_split_extended))) / sqrt(y_train_split.shape[0])
+        rmse_te[ind_lambda] = np.linalg.norm((y_test_split - compute_p(w_star,tX_test_split_extended)))/ sqrt(y_test_split.shape[0])
         
         abse_tr[ind_lambda] = np.sum(abs(y_train_split - [compute_p(w_star,tX_train_split_extended) > 0.5]))
         abse_te[ind_lambda] = np.sum(abs(y_test_split - [compute_p(w_star,tX_test_split_extended) > 0.5]))
@@ -151,8 +152,8 @@ def train_test_split_logistic_regression_feature_engineering_ridge(tX, y, degree
         log_likelihoods_train = calculate_loss_logistic_regression(y_train_split, tX_train_split_extended, w_star)
         log_likelihoods_test = calculate_loss_logistic_regression(y_test_split, tX_test_split_extended, w_star)
     
-        rmse_tr[ind_lambda] = np.linalg.norm((y_train_split - compute_p(w_star,tX_train_split_extended))/y_train_split.shape[0])
-        rmse_te[ind_lambda] = np.linalg.norm((y_test_split - compute_p(w_star,tX_test_split_extended))/y_test_split.shape[0])
+        rmse_tr[ind_lambda] = np.linalg.norm((y_train_split - compute_p(w_star,tX_train_split_extended))) /sqrt(y_train_split.shape[0])
+        rmse_te[ind_lambda] = np.linalg.norm((y_test_split - compute_p(w_star,tX_test_split_extended))) /sqrt(y_test_split.shape[0])
         
         abse_tr[ind_lambda] = np.sum(abs(y_train_split - [compute_p(w_star,tX_train_split_extended) > 0.5]))
         abse_te[ind_lambda] = np.sum(abs(y_test_split - [compute_p(w_star,tX_test_split_extended) > 0.5]))

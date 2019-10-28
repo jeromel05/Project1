@@ -1,5 +1,6 @@
 #FOR LOGISTIC REGRESSION
 import numpy as np
+from math import sqrt
 
 def sigmoid(t):
     """apply sigmoid function on t."""
@@ -45,7 +46,7 @@ def compute_p(w,tX):
     return odds/(1+odds)
 
 def rmse_logistic(err,tX):
-    return np.linalg.norm(err/tX.shape[0])
+    return np.linalg.norm(err)/sqrt(tX.shape[0])
 
 """
 def logistic_regression(y, tX, max_iters, threshold, gamma = 1):
