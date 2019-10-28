@@ -69,6 +69,7 @@ The folders are organized this way :
        - src
        - utilities
        - plots
+       - results_of_lengthy_computations
          
  The src folder contains all the main notebook where all the listed methods are used.
  The project to run is in the following path : /project1/scripts/src/project1.ipynib.  
