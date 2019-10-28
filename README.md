@@ -18,9 +18,9 @@ The code is clearly separated into 4 different parts.
   - Least Squares normal equations
   - Ridge regression
   - Logistic regression
-   - GD
-   - Newton
-   - Regularized
+        - GD
+        - Newton
+        - Regularized
 - More complex analysis
   - Tuning hyperparameters
 - Generating predictions
@@ -65,13 +65,15 @@ The folders are organized this way :
     - project1_description.pdf
     - data
     - scripts
-     - src
-     - utilities
-     - data
+          - src
+          - utilities
+          - plots
          
  The project to run is in the following path : /project1/scripts/src/project1.ipynib
  You can find all the requested regression methods in the path : /project1/scripts/utilities/implementations.py
  The other files in the folder utilities are all the functions we used to modularize the code in the project.
+ The plots folder contains all the savec plots produced by the project1 script.
+ The src folder contains all the main notebook where all the listed mehtods are used.
  
  
         
