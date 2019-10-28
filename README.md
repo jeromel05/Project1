@@ -54,6 +54,40 @@ We generate predictions on the given test with the weights obtained using the pr
 ## How to run the code
 In order to be able to run the code, you should be able to run Jupyter Notebooks (requires the installation of Anaconda), 
 and the following libraries should be installed: numpy and matplotlib.
+Notice that you should first download the data to be able to run the code, they are available at AICrowd at the EPFL Machine Learning Higgs 2019 challenge, in the tab 'resources' : https://www.aicrowd.com/challenges/epfl-machine-learning-higgs-2019/dataset_files .
 The code runs sequentially, so it is very important to start running the code from the begining of the file.
-Also, the tuning of the hyperparameters is a lengthy process (30min) so we stored the results in a numpy file. So you can just skip this cell 
-amd run the next one where the data from the file is loaded.
+Also, the tuning of the hyperparameters is a lengthy process (30min) so we stored the results in a numpy file. So you can just skip this cell and run the next one where the data from the file is loaded.
+
+## Folder plan 
+You should put the downoaded files in a new folder 'data' in the folder 'project1'. 
+The folders are organized this way : 
+- project1
+    project1_description.pdf
+    - data
+    - scripts
+        - src
+            project1.ipynib
+        - utilities
+            datapreprocessing.py
+            functions_for_complex_analysis.py
+            functions_for_log_regression.py
+            gradient_descent.py
+            implementations.py
+            loss_computations.py
+            patternsmissingvalues.py
+            plots.py
+            proj1_helpers.py
+            split_test_train.py
+            visualization_PCA.py
+    - data
+         sample-submission.csv
+         test.csv
+         train.csv
+         
+         
+ The project to run is in the following path : /project1/scripts/src/project1.ipynib
+ You can find all the requested regression methods in the path : /project1/scripts/utilities/implementations.py
+ The other files in the folder utilities are all the functions we used to modularize the code in the project.
+ 
+ 
+        
