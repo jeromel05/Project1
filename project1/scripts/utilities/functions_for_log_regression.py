@@ -2,6 +2,10 @@
 import numpy as np
 from math import sqrt
 
+from patternsmissingvalues import *
+from datapreprocessing import *
+import matplotlib.pyplot as plt
+
 def sigmoid(t):
     """apply sigmoid function on t."""
     if(len(t) > 1):
@@ -105,6 +109,8 @@ def sigmoid(t):
     return odds/(1+odds)
 """
 
+### Logistic regression on groups pattern missing values
+
 def calculate_loss_logistic_regression(y, tX, w):
     "Computes the negative log likelihood of observing the data tX with the given weights w."
     return sum((np.log(1+np.exp(np.dot(tX, w)))) - y*np.dot(tX, w) )
@@ -175,3 +181,73 @@ def penalized_logistic_regression(y, tX, max_iters, threshold, lambda_, gamma = 
         
 
     return log_likelihoods, ws
+
+
+def generate_predicitons_reg_logistic_regression_feature_engineering_groups(tX_test,tX,y,max_iters,threshold,lambda_star_groups,degrees_star_groups,gamma):
+    "Generates predictions of the y values for a data set tX_test, plots predictions for the training set groupwise."
+    tX_split_test, ind_row_groups_test, groups_mv_num_test = split_data_according_to_pattern_of_missing_values(tX_test)
+    tX_split, ind_row_groups, groups_mv_num = split_data_according_to_pattern_of_missing_values(tX)
+    
+    assert(np.array_equal(groups_mv_num, groups_mv_num_test))
+    
+    w_star_groups = []
+    y_pred_test = np.zeros(tX_test.shape[0])
+    y_pred_train = np.zeros(tX.shape[0])
+
+    num_col = 3
+    num_row = 2
+    f, axs = plt.subplots(num_row, num_col)
+
+    for ind_group in range(len(groups_mv_num)):
+        print('group (' + str(ind_group + 1) + '/' + str(len(groups_mv_num)) + ')')
+    
+        tX_group = tX[ind_row_groups[ind_group]]
+        degree_group = degrees_star_groups[ind_group]
+        tX_test_group = tX_test[ind_row_groups_test[ind_group]]
+        y_group = rescale_y(y[ind_row_groups[ind_group]])
+        lambda_group = lambda_star_groups[ind_group]
+    
+        tX_train_group_extended = add_higher_degree_terms(tX_group, degree_group)
+        tX_test_group_extended = add_higher_degree_terms(tX_test_group, degree_group)
+    
+        # ***************************************************
+        # calcualte most likely weights through logistic regression with ridge term
+        # ***************************************************
+        ind_col_non_const = np.arange(len(tX_train_group_extended[0,:]))[np.std(tX_train_group_extended,0)>0]
+    
+        tX_train_group_extended = adding_offset(tX_train_group_extended)
+        tX_test_group_extended = adding_offset(tX_test_group_extended)
+        ind_col_non_const += 1
+        ind_col_non_const = np.insert(ind_col_non_const,0, 0)
+    
+        log_likelihoods, ws = penalized_logistic_regression(y_group, tX_train_group_extended[:,ind_col_non_const], max_iters, threshold,lambda_group,gamma)
+    
+        ind_min = np.argmin(log_likelihoods)
+        w_star = np.zeros(len(tX_train_group_extended[0,:]))
+        w_star[ind_col_non_const] = ws[ind_min]
+
+        # ***************************************************
+        # calculate RMSE and ABSE for train data,and store them in rmse_tr and abse_tr respectively
+        # ***************************************************
+        w_star_groups.append(w_star)
+        y_pred_train[ind_row_groups[ind_group]] = compute_p(w_star,tX_train_group_extended)
+        y_pred_test[ind_row_groups_test[ind_group]] = compute_p(w_star,tX_test_group_extended)
+    
+        log_likelihoods_train = calculate_loss_logistic_regression(y_group, tX_train_group_extended, w_star)
+        rmse_tr = np.linalg.norm(y_group - compute_p(w_star,tX_train_group_extended))/sqrt(y_group.shape[0])
+        abse_tr = np.sum(abs(y_group - [compute_p(w_star,tX_train_group_extended) > 0.5]))
+    
+        ax = axs[ind_group // num_col][ind_group % num_col]
+        ax.scatter(y_pred_train[ind_row_groups[ind_group]][0:200],y_group[0:200],s=1)
+        ax.set_xlabel("y pred train")
+        ax.set_ylabel("y train")
+        
+        print("group={g}, degree={d} , lambda={l:10.3e}, Training RMSE={tr:.3f}, Training loss={trl:.3f}, Training # Missclassification ={m_tr:.3f}".format(
+            g=ind_group,d=degree_group,  l= lambda_group, tr=rmse_tr, trl = log_likelihoods_train, m_tr = abse_tr))
+
+    plt.tight_layout()
+    plt.savefig("../plots/predictions_vs_y_value_training_groups_patter")
+    plt.show()
+    y_pred_test = rescale_predictions(y_pred_test)
+    
+    return y_pred_test, w_star_groups
