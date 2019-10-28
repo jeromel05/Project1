@@ -5,11 +5,11 @@ The code is clearly separated into 4 different parts.
   - Correlation Matrix
   - PCA
   - Missing values
-    - Replacement by mean
-    - Separation into patterns
+   - Replacement by mean
+   - Separation into patterns
   - Distributions of features
-    - Histograms
-    - Boxplots
+   - Histograms
+   - Boxplots
 - Feature processing
   - Interactions between variables
 - Implementations
@@ -18,9 +18,9 @@ The code is clearly separated into 4 different parts.
   - Least Squares normal equations
   - Ridge regression
   - Logistic regression
-    - GD
-    - Newton
-    - Regularized
+   - GD
+   - Newton
+   - Regularized
 - More complex analysis
   - Tuning hyperparameters
 - Generating predictions
@@ -62,28 +62,12 @@ Also, the tuning of the hyperparameters is a lengthy process (30min) so we store
 You should put the downoaded files in a new folder 'data' in the folder 'project1'. 
 The folders are organized this way : 
 - project1
-    project1_description.pdf
+    - project1_description.pdf
     - data
     - scripts
-        - src
-            project1.ipynib
-        - utilities
-            datapreprocessing.py
-            functions_for_complex_analysis.py
-            functions_for_log_regression.py
-            gradient_descent.py
-            implementations.py
-            loss_computations.py
-            patternsmissingvalues.py
-            plots.py
-            proj1_helpers.py
-            split_test_train.py
-            visualization_PCA.py
-    - data
-         sample-submission.csv
-         test.csv
-         train.csv
-         
+     - src
+     - utilities
+     - data
          
  The project to run is in the following path : /project1/scripts/src/project1.ipynib
  You can find all the requested regression methods in the path : /project1/scripts/utilities/implementations.py
